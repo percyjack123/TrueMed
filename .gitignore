@@ -1,0 +1,16 @@
+# Node (frontend)
+node_modules/
+dist/
+
+# Python (backend)
+__pycache__/
+*.pyc
+
+# Machine Learning
+*.h5
+
+# Uploads & temporary files
+uploads/
+
+# Environment
+.env
