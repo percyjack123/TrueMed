@@ -2,7 +2,6 @@ streamlit
 numpy
 pandas
 scikit-learn
-keras
 opencv-python
 pillow
 matplotlib
@@ -10,8 +9,8 @@ seaborn
 pytesseract
 requests
 joblib
-tensorflow==2.15.0
-pillow
 scipy
+tensorflow==2.15.0
 huggingface_hub
+
 
