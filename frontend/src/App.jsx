@@ -14,32 +14,45 @@ export default function App() {
     const formData = new FormData();
     formData.append("image", image);
 
-    const res = await fetch("http://127.0.0.1:5000/predict", {
-      method: "POST",
-      body: formData
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: formData
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    const enriched = {
-      ...data,
-      verdict:
-        data.visual_blur_ok && data.batch_id_valid
-          ? "LEGALLY AUTHENTIC"
-          : "SUSPICIOUS",
-      reasons: [
-        ...(data.visual_blur_ok ? [] : ["Blur / tampering detected in packaging"]),
-        ...(data.batch_id_valid ? [] : ["Batch ID missing or inconsistent"])
-      ]
-    };
+      const enriched = {
+        ...data,
+        verdict:
+          data.visual_blur_ok && data.batch_id_valid
+            ? "LEGALLY AUTHENTIC"
+            : "SUSPICIOUS",
+        reasons: [
+          ...(data.visual_blur_ok
+            ? []
+            : ["Blur or tampering detected in packaging"]),
+          ...(data.batch_id_valid
+            ? []
+            : ["Batch ID not found or does not match database"])
+        ]
+      };
 
-    setResult(enriched);
+      setResult(enriched);
+    } catch (err) {
+      setResult({
+        verdict: "ERROR",
+        confidence: 0,
+        reasons: ["Backend connection failed"]
+      });
+    }
+
     setLoading(false);
   };
 
   return (
-    <div className="relative min-h-screen text-slate-200 overflow-hidden">
-      {/* Background */}
+    <div className="relative min-h-screen overflow-hidden text-slate-200">
+      {/* Background layers */}
       <div className="ai-lab-bg" />
       <div className="ai-orb-corner" />
 
@@ -57,7 +70,7 @@ export default function App() {
             </p>
           </div>
 
-          {/* Two Cards */}
+          {/* Two-card layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
             {/* INPUT CARD */}
@@ -76,13 +89,14 @@ export default function App() {
 
               <label
                 htmlFor="upload"
-                className="flex flex-col items-center justify-center rounded-xl border border-dashed border-sky-400/40 px-6 py-12 cursor-pointer transition hover:border-sky-400 hover:bg-sky-400/5"
+                className="flex flex-col items-center justify-center rounded-xl border border-dashed border-sky-400/40 px-6 py-12 cursor-pointer transition
+                           hover:border-sky-400 hover:bg-sky-400/5"
               >
                 <span className="text-sky-400 font-medium">
                   {image ? "Change image" : "Upload medicine image"}
                 </span>
                 <span className="mt-2 text-xs text-slate-500">
-                  Clear photo of packaging
+                  Clear photo of medicine packaging
                 </span>
               </label>
 
@@ -123,23 +137,27 @@ export default function App() {
                         className={`ml-2 ${
                           result.verdict === "LEGALLY AUTHENTIC"
                             ? "text-emerald-400"
+                            : result.verdict === "ERROR"
+                            ? "text-amber-400"
                             : "text-rose-400"
                         }`}
                       >
                         {result.verdict}
                       </span>
                     </p>
+
                     <p className="text-sm text-slate-400 mt-1">
                       Confidence score: {result.confidence}%
                     </p>
                   </div>
 
-                  {result.reasons.length > 0 ? (
+                  {result.reasons && result.reasons.length > 0 ? (
                     <ul className="space-y-3">
                       {result.reasons.map((r, i) => (
                         <li
                           key={i}
-                          className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300"
+                          className="rounded-lg border border-amber-500/20 bg-amber-500/10
+                                     px-4 py-3 text-xs text-amber-300"
                         >
                           {r}
                         </li>
