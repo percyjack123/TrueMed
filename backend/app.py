@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import random
+from model.predictor import predict_image
 
 app = Flask(__name__)
 CORS(app)
@@ -11,10 +11,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "project": "TrueMed",
-        "status": "Backend running"
-    })
+    return jsonify({"status": "TrueMed backend running"})
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -22,19 +19,11 @@ def predict():
         return jsonify({"error": "No image uploaded"}), 400
 
     image = request.files["image"]
-    image.save(os.path.join(UPLOAD_FOLDER, image.filename))
+    image_path = os.path.join(UPLOAD_FOLDER, image.filename)
+    image.save(image_path)
 
-    # MOCK RESULT (replace later with real ML)
-    is_fake = random.choice([True, False])
-    confidence = round(random.uniform(70, 95), 2)
-
-    return jsonify({
-    "project": "TrueMed",
-    "visual_blur_ok": random.choice([True, False]),
-    "batch_id_valid": random.choice([True, False]),
-    "confidence": round(random.uniform(75, 95), 2)
-})
-
+    result = predict_image(image_path)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)
