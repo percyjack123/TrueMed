@@ -1,0 +1,16 @@
+streamlit
+numpy
+pandas
+scikit-learn
+opencv-python
+pillow
+matplotlib
+seaborn
+pytesseract
+requests
+joblib
+scipy
+tensorflow==2.15.0
+huggingface_hub
+
+

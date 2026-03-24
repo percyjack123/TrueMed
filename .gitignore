@@ -1,0 +1,11 @@
+*.h5
+uploads/
+__pycache__/
+*.pyc
+.env
+node_modules/
+venv*/
+dist/
+build/
+*.log
+.DS_Store
